@@ -1,9 +1,9 @@
 # Unit 1: Embeddings, Vector DBs & RAG with Hybrid Search, Advanced Parsing, and Eval Harnesses
 
 ## Progress Summary
-- **Current step:** _Not started_
-- **Last updated:** _YYYY-MM-DD_
-- **Notes/blockers:** _None_
+- **Current step:** Parse your first document
+- **Last updated:** 2026-06-23
+- **Notes/blockers:** Python package is named `ragu` (not `unit_1`). Langfuse smoke test at `tests/langfuse_smoke_test.py`. Corpus: 8 research PDFs on AI, cognitive offloading, and student learning (in `data/`).
 
 ## Main Topics
 * Embeddings & Cosine Similarity
@@ -32,15 +32,15 @@ Build a Python pipeline that ingests a folder of technical PDFs or engineering n
 
   **Week 1 — Ingestion, retrieval, and eval foundations**
 
-  - [ ] **Scaffold the project.** Create a `unit-1/` Python package with a virtual environment, `requirements.txt`, and a `.env` for API keys. Add a `data/` folder for source documents and an `eval/` folder for your test set.
+  - [x] **Scaffold the project.** Create a `ragu/` Python package with a virtual environment, `requirements.txt`, and a `.env` for API keys. Add a `data/` folder for source documents and an `eval/` folder for your test set.
      > **Theory:** Treat this like any backend service: separate config (`.env`) from code, pin dependencies, and keep raw data out of git. You'll be iterating on retrieval logic constantly — a clean layout saves hours later.
-     > **Trade-offs:** Monorepo (`ai-engineer/unit-1/`) vs separate repos — use a monorepo here so Unit 2 can import your RAG code directly. `uv` or `poetry` vs plain `pip` — either is fine; pick one and move on.
+     > **Trade-offs:** Monorepo (`unit-1-RAG/ragu/`) vs separate repos — use a monorepo here so Unit 2 can import your RAG code directly (e.g. `from ragu.search import ...`). `uv` or `poetry` vs plain `pip` — either is fine; pick one and move on.
 
-  - [ ] **Set up Langfuse.** Create a Langfuse account, install the SDK, and write a 10-line script that logs a dummy trace. Confirm it appears in the Langfuse UI before building anything else.
+  - [x] **Set up Langfuse.** Create a Langfuse account, install the SDK, and write a 10-line script that logs a dummy trace. Confirm it appears in the Langfuse UI before building anything else.
      > **Theory:** Observability for AI systems is closer to distributed tracing (Jaeger, OpenTelemetry) than to traditional logging. A *trace* is one end-to-end request; *spans* are sub-steps within it. Logging retrieval inputs/outputs from day one means you can debug bad answers without re-running experiments blind.
      > **Trade-offs:** Langfuse vs LangSmith vs Phoenix — all solve a similar problem. Langfuse is open-source and self-hostable; LangSmith is tightly integrated with LangChain. Pick one and use it consistently across all 4 units.
 
-  - [ ] **Curate your document corpus.** Collect 5–10 technical PDFs or markdown files (course notes, API docs, engineering blog posts). Pick material you can actually answer questions about — you'll write eval questions from this.
+  - [x] **Curate your document corpus.** Collect 5–10 technical PDFs or markdown files (course notes, API docs, engineering blog posts). Pick material you can actually answer questions about — you'll write eval questions from this.
      > **Theory:** RAG quality has a ceiling set by your source data — "garbage in, garbage out" applies literally. Your eval set can only be as good as the documents you choose. Heterogeneous formats (PDFs + markdown) stress-test your parser pipeline early.
      > **Trade-offs:** Small curated corpus (5–10 docs you know well) vs large messy dump — start small. You need to hand-write eval questions, which requires actually reading the material.
 

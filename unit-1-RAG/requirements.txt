@@ -1,0 +1,3 @@
+# Pin exact versions as you add packages.
+langfuse==4.10.0
+python-dotenv==1.1.0
