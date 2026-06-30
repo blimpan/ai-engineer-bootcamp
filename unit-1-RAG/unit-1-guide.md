@@ -1,9 +1,9 @@
 # Unit 1: Embeddings, Vector DBs & RAG with Hybrid Search, Advanced Parsing, and Eval Harnesses
 
 ## Progress Summary
-- **Current step:** Parse your first document
-- **Last updated:** 2026-06-23
-- **Notes/blockers:** Python package is named `ragu` (not `unit_1`). Langfuse smoke test at `tests/langfuse_smoke_test.py`. Corpus: 8 research PDFs on AI, cognitive offloading, and student learning (in `data/`).
+- **Current step:** Build the ingestion pipeline
+- **Last updated:** 2026-06-30
+- **Notes/blockers:** Python package is named `ragu` (not `unit_1`). Langfuse smoke test at `tests/langfuse_smoke_test.py`. Corpus: 8 research PDFs on AI, cognitive offloading, and student learning (in `data/`). First parse validated: `parsed/Knowledge about neuroscience doesnt protect teachers from myths.md`.
 
 ## Main Topics
 * Embeddings & Cosine Similarity
@@ -44,7 +44,7 @@ Build a Python pipeline that ingests a folder of technical PDFs or engineering n
      > **Theory:** RAG quality has a ceiling set by your source data — "garbage in, garbage out" applies literally. Your eval set can only be as good as the documents you choose. Heterogeneous formats (PDFs + markdown) stress-test your parser pipeline early.
      > **Trade-offs:** Small curated corpus (5–10 docs you know well) vs large messy dump — start small. You need to hand-write eval questions, which requires actually reading the material.
 
-  - [ ] **Parse your first document.** Use `LlamaParse` to convert one PDF to structured Markdown. Inspect the output manually: are tables preserved? Are headings intact? Note what breaks before scaling up.
+  - [x] **Parse your first document.** Use `LlamaParse` to convert one PDF to structured Markdown. Inspect the output manually: are tables preserved? Are headings intact? Note what breaks before scaling up.
      > **Theory:** PDFs are a presentation format, not a storage format — text extraction is genuinely hard. Layout-aware parsers use vision models or heuristics to reconstruct structure (headings, tables, columns). Bad parsing silently corrupts chunks downstream; no amount of embedding tuning fixes a table that became a word salad.
      > **Trade-offs:** LlamaParse (cloud API, high quality, costs money) vs Marker (open-source, self-hosted, GPU-hungry) vs PyMuPDF/pdfplumber (free, fast, layout-naive). For technical docs with tables, layout-aware parsing is worth the cost. For clean markdown, skip parsing entirely.
 
