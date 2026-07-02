@@ -44,7 +44,7 @@ def chunk_text_sliding_window(text: str, source_file: Path, chunk_size: int = 51
 
         current_section_title = None
         for section_start, section_title in reversed(section_boundaries):
-            if section_start < window_start + chunk_size:
+            if section_start < window_start + (chunk_size/2):
                 current_section_title = section_title
                 break
         
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     markdown_content = markdown_file.read_text(encoding="utf-8")
     chunks: list[Chunk] = []
 
-    chunk_type = "section_title"
+    chunk_type = "sliding_window"
     if chunk_type == "sliding_window":
         chunks = chunk_text_sliding_window(markdown_content, markdown_file)
     elif chunk_type == "section_title":
