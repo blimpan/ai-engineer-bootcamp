@@ -1,9 +1,9 @@
 # Unit 1: Embeddings, Vector DBs & RAG with Hybrid Search, Advanced Parsing, and Eval Harnesses
 
 ## Progress Summary
-- **Current step:** Build the ingestion pipeline
-- **Last updated:** 2026-06-30
-- **Notes/blockers:** Python package is named `ragu` (not `unit_1`). Langfuse smoke test at `tests/langfuse_smoke_test.py`. Corpus: 8 research PDFs on AI, cognitive offloading, and student learning (in `data/`). First parse validated: `parsed/Knowledge about neuroscience doesnt protect teachers from myths.md`.
+- **Current step:** Write your eval set (start small)
+- **Last updated:** 2026-07-11
+- **Notes/blockers:** End-to-end pipeline working: parse → chunk → embed → Qdrant → retrieval CLI (`python -m ragu.main`). Fingerprints for parse + index caching. Qdrant health check on startup. `page_number` metadata not yet captured at parse time. Langfuse smoke test at `tests/test_langfuse_smoke.py`. Corpus: 8 research PDFs on AI, cognitive offloading, and student learning (in `data/`).
 
 ## Main Topics
 * Embeddings & Cosine Similarity
@@ -48,15 +48,15 @@ Build a Python pipeline that ingests a folder of technical PDFs or engineering n
      > **Theory:** PDFs are a presentation format, not a storage format — text extraction is genuinely hard. Layout-aware parsers use vision models or heuristics to reconstruct structure (headings, tables, columns). Bad parsing silently corrupts chunks downstream; no amount of embedding tuning fixes a table that became a word salad.
      > **Trade-offs:** LlamaParse (cloud API, high quality, costs money) vs Marker (open-source, self-hosted, GPU-hungry) vs PyMuPDF/pdfplumber (free, fast, layout-naive). For technical docs with tables, layout-aware parsing is worth the cost. For clean markdown, skip parsing entirely.
 
-  - [ ] **Build the ingestion pipeline.** Write a script that walks your `data/` folder, parses every file, and saves clean Markdown to a `parsed/` directory. Attach metadata to each document: `source_file`, `page_number`, `section_title`.
+  - [x] **Build the ingestion pipeline.** Write a script that walks your `data/` folder, parses every file, and saves clean Markdown to a `parsed/` directory. Attach metadata to each document: `source_file`, `page_number`, `section_title`.
      > **Theory:** Ingestion is an ETL pipeline — Extract (parse), Transform (clean/chunk), Load (embed + index). Metadata isn't optional decoration; it powers citation grounding ("answer came from `api-docs.pdf`, page 12") and filtered retrieval ("only search `section_title: Authentication`").
      > **Trade-offs:** Re-parse on every run vs cache parsed output — cache to `parsed/` so you don't re-bill LlamaParse during retrieval experiments. Store metadata in the vector DB payload, not just in a sidecar file, so filters work at query time.
 
-  - [ ] **Implement chunking.** Split parsed text into chunks with configurable `chunk_size` and `chunk_overlap` (start with 512 / 64). Store chunk text plus metadata. Print a few chunks to verify boundaries look sensible.
+  - [x] **Implement chunking.** Split parsed text into chunks with configurable `chunk_size` and `chunk_overlap` (start with 512 / 64). Store chunk text plus metadata. Print a few chunks to verify boundaries look sensible.
      > **Theory:** Embeddings encode *a fixed amount of text* into a single vector. Too large a chunk → the vector averages over unrelated topics (diluted semantics). Too small → you lose context ("it" no longer refers to anything). Overlap ensures sentences at chunk boundaries aren't orphaned. Cosine similarity then finds chunks whose *meaning* is closest to the query vector — but meaning is only as good as the chunk boundary.
      > **Trade-offs:** Fixed-size chunking (simple, predictable) vs semantic/recursive splitting (respects paragraph/heading boundaries, harder to implement) vs document-structure chunking (split on `##` headings — often the best free option for markdown). Start fixed at 512 tokens; later try heading-based and compare on your eval set. Rule of thumb: one chunk ≈ one idea.
 
-  - [ ] **Embed and index into Qdrant.** Run chunks through an embedding model (OpenAI `text-embedding-3-small` or similar), upsert vectors + metadata into a local Qdrant instance (Docker is fine). Write a `search(query, top_k=5)` function that returns ranked chunks.
+  - [x] **Embed and index into Qdrant.** Run chunks through an embedding model (OpenAI `text-embedding-3-small` or similar), upsert vectors + metadata into a local Qdrant instance (Docker is fine). Write a `search(query, top_k=5)` function that returns ranked chunks.
      > **Theory:** Embedding models are *bi-encoders*: query and document are embedded independently, then compared via cosine similarity. This is fast (pre-compute document vectors) but approximate — the model never "sees" query and document together. Vector DBs store millions of these pre-computed vectors and return the nearest neighbors in milliseconds via approximate nearest neighbor (ANN) indexes (HNSW in Qdrant).
      > **Trade-offs:** Qdrant vs Chroma vs pgvector — Qdrant has strong hybrid search and metadata filtering built in; Chroma is simpler to start; pgvector makes sense if you already run Postgres. For embedding models: OpenAI `text-embedding-3-small` (cheap, good general quality) vs Cohere Embed v3 (better multilingual) vs open-source `bge-small` (free, self-hosted, slightly lower quality). API embeddings are fine for learning; switch to local only if cost or privacy demands it.
 
@@ -66,7 +66,7 @@ Build a Python pipeline that ingests a folder of technical PDFs or engineering n
 
   **Week 2 — Hybrid search, reranking, generation, and measurement**
 
-  - [ ] **Build a retrieval-only CLI.** A script that takes a question, runs `search()`, and prints the top-5 chunks with source citations. No LLM yet — just verify retrieval quality by eye against your eval questions.
+  - [x] **Build a retrieval-only CLI.** A script that takes a question, runs `search()`, and prints the top-5 chunks with source citations. No LLM yet — just verify retrieval quality by eye against your eval questions.
      > **Theory:** Separating retrieval evaluation from generation is a core SWE discipline. If the right chunks aren't in the top-5, no LLM prompt engineering will save you. This CLI is your retrieval unit test — run it every time you change chunking, embeddings, or search strategy.
      > **Trade-offs:** Manual inspection (fast feedback, subjective) vs automated recall@k on your eval set (objective, requires labeling which chunks are relevant per question). Do both: eyeball for the first 5 questions, automate as you scale to 25.
 

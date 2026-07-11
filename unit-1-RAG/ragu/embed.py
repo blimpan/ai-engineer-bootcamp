@@ -7,13 +7,15 @@ from openai import OpenAI
 
 client = OpenAI()
 
+EMBEDDING_MODEL = "text-embedding-3-small"
+
 
 def embed_text(text: str) -> list[float]:
     """Embed text using OpenAI's text-embedding-3-small model."""
     try:
         response = client.embeddings.create(
             input=text,
-            model="text-embedding-3-small"
+            model=EMBEDDING_MODEL,
         )
         return response.data[0].embedding
     except Exception as e:

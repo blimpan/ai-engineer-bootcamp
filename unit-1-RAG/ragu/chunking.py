@@ -6,6 +6,10 @@ from dataclasses import dataclass
 
 encoder = get_encoding("cl100k_base")
 
+CHUNK_SIZE = 512
+CHUNK_OVERLAP = 64
+CHUNK_STRATEGY = "sliding_window"
+
 
 @dataclass
 class Chunk:
@@ -29,7 +33,12 @@ def get_section_boundaries(text: str) -> list[tuple[int, str]]:
     return boundaries
 
 
-def chunk_text_sliding_window(text: str, source_file: Path, chunk_size: int = 512, chunk_overlap: int = 64) -> list[Chunk]:
+def chunk_text_sliding_window(
+    text: str,
+    source_file: Path,
+    chunk_size: int = CHUNK_SIZE,
+    chunk_overlap: int = CHUNK_OVERLAP,
+) -> list[Chunk]:
     """Chunk text into chunks using a sliding window approach."""
     tokens = encoder.encode(text)
     stride = chunk_size - chunk_overlap
